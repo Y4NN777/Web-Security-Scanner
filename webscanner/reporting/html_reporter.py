@@ -1,0 +1,1 @@
+# HTML reports for vulnerabilities
