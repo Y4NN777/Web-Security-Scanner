@@ -3,9 +3,9 @@ import requests
 from typing import List, Dict, Any
 from ..crawling.web_crawler import WebCrawler
 from ..detection.sql_detector import SQLDetector
-from ..detection.xss_detector import XSSDetector  # You'll create this
+from ..detection.xss_detector import XSSDetector 
 from ..reporting.vulnerability_report import VulnerabilityReport
-from ..detection.header_detector import SecurityHeadersDetector  # You'll create this
+from ..detection.header_detector import SecurityHeadersDetector 
 from ..reporting.console_reporter import ConsoleReporter
 import colorama
 import concurrent.futures
