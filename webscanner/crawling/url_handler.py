@@ -3,7 +3,7 @@ import urllib.parse
 from typing import List, Dict, Set
 import re
 
-class URLHAndler:
+class URLHandler:
     """Class for handling URL normalization and encoding.
     """
 
