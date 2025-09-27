@@ -44,10 +44,13 @@ class ScannerEngine:
             sql_config = detector_config.get('sql_injection', {})
             detectors.append(SQLDetector(self.session, sql_config))
         
-        # Add other detectors as you create them
-        detectors.append(XSSDetector(self.session, detector_config.get('xss', {})))
-        detectors.append(SecurityHeadersDetector(self.session, detector_config.get('headers', {})))
-        
+        # Add Security Headers detector
+        if detector_config.get('security_headers', {}).get('enabled', True):
+            headers_config = detector_config.get('security_headers', {})
+            
+            detectors.append(SecurityHeadersDetector(self.session, headers_config))
+            detectors.append(XSSDetector(self.session, detector_config.get('xss', {})))
+            
         return detectors
     
     def scan(self) -> VulnerabilityReport:
