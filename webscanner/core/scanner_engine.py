@@ -5,8 +5,10 @@ from ..crawling.web_crawler import WebCrawler
 from ..detection.sql_detector import SQLDetector
 from ..detection.xss_detector import XSSDetector  # You'll create this
 from ..reporting.vulnerability_report import VulnerabilityReport
+from ..detection.header_detector import SecurityHeadersDetector  # You'll create this
 from ..reporting.console_reporter import ConsoleReporter
 import colorama
+import concurrent.futures
 
 class ScannerEngine:
     """Main scanning engine that coordinates all modules"""
@@ -43,8 +45,8 @@ class ScannerEngine:
             detectors.append(SQLDetector(self.session, sql_config))
         
         # Add other detectors as you create them
-        # detectors.append(XSSDetector(self.session, detector_config.get('xss', {})))
-        # detectors.append(HeaderDetector(self.session, detector_config.get('headers', {})))
+        detectors.append(XSSDetector(self.session, detector_config.get('xss', {})))
+        detectors.append(SecurityHeadersDetector(self.session, detector_config.get('headers', {})))
         
         return detectors
     
@@ -56,12 +58,13 @@ class ScannerEngine:
         print(f"{colorama.Fore.YELLOW}Phase 1: Crawling and discovery{colorama.Style.RESET_ALL}")
         pages_found = 0
         
-        for page_data in self.crawler.crawl(self.target_url):
-            pages_found += 1
-            print(f"  Discovered: {page_data['url']}")
-            
-            # Phase 2: Vulnerability Detection
-            self._scan_page(page_data)
+        page_datas = list(self.crawler.crawl(self.target_url))
+        pages_found = len(page_datas)
+        print(f"  Discovered: {pages_found} pages")
+
+        print(f"\n{colorama.Fore.YELLOW}Phase 2: Vulnerability Detection (multi-threaded){colorama.Style.RESET_ALL}")
+        with concurrent.futures.ThreadPoolExecutor() as executor:
+            list(executor.map(self._scan_page, page_datas))
         
         print(f"\n{colorama.Fore.YELLOW}Phase 2: Vulnerability detection complete{colorama.Style.RESET_ALL}")
         print(f"  Pages scanned: {pages_found}")
